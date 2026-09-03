@@ -2531,16 +2531,6 @@ files = [
 ]
 
 [[package]]
-name = "macfsevents"
-version = "0.8.4"
-description = "Thread-based interface to file system observation primitives."
-optional = false
-python-versions = "*"
-files = [
-    {file = "MacFSEvents-0.8.4.tar.gz", hash = "sha256:bf7283f1d517764ccdc8195b21631dbbac1c506b920bf9a8ea2956b3127651cb"},
-]
-
-[[package]]
 name = "macholib"
 version = "1.16.4"
 description = "Mach-O header analysis and editing"
@@ -6653,4 +6643,4 @@ napari = ["napari", "napari-ome-zarr", "pyqt6"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.15"
-content-hash = "26b3ca512cd8784baac39f1801b96bdf74e8c78c058478a4c8d8b1a993f04003"
+content-hash = "2a7360829af67eb8b2e1775979833cb3594636f792276cc1fa2d3975e0e9c315"
