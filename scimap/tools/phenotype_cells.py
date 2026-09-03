@@ -287,7 +287,7 @@ Example:
 
     if verbose:
         print("Consolidating the phenotypes across all groups")
-    phenotype_labels_Consolidated = phenotype_labels.fillna(method='ffill', axis = 1)
+    phenotype_labels_Consolidated = phenotype_labels.ffill(axis=1)
     phenotype_labels[label] = phenotype_labels_Consolidated.iloc[:,-1].values
 
     # replace nan to 'other cells'
@@ -350,4 +350,3 @@ if __name__ == '__main__':
                    imageid=args.imageid, 
                    phenotype_threshhold_percent=args.pheno_threshold_percent, 
                    pheno_threshold_abs=args.pheno_threshold_abs)
-    

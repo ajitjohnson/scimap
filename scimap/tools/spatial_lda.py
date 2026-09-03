@@ -19,15 +19,10 @@
 """
 
 #Import
+from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.neighbors import BallTree
 import numpy as np
 import pandas as pd
-import re
-
-# Gensim
-import gensim
-import gensim.corpora as corpora
-from gensim.models import CoherenceModel
 
 # Function
 def spatial_lda (adata, 
@@ -87,6 +82,10 @@ Parameters:
 
         label (str, optional):  
             Custom label for storing results in `adata.uns`.
+
+        **kwargs:
+            Additional keyword arguments passed to scikit-learn's
+            `LatentDirichletAllocation` estimator.
 
 Returns:
         adata (anndata.AnnData):  
@@ -212,59 +211,41 @@ Example:
     # LDA pre-processing
     if verbose:
         print ('Pre-Processing Spatial LDA')
-    # Create Dictionary
-    id2word = corpora.Dictionary(texts)
+    # Convert neighbourhoods into the integer document-term matrix expected by
+    # scikit-learn. Each row represents one cell neighbourhood.
+    cell_types = np.unique(adata.obs[phenotype].astype(str))
+    cell_type_index = {cell_type: index for index, cell_type in enumerate(cell_types)}
+    document_term_matrix = np.zeros((len(texts), len(cell_types)), dtype=np.int64)
+    for document_index, neighbours in enumerate(texts):
+        for cell_type in neighbours:
+            document_term_matrix[
+                document_index, cell_type_index[str(cell_type)]
+            ] += 1
 
-    # Term Document Frequency
-    corpus = [id2word.doc2bow(text) for text in texts]
-    
     # Build LDA model
     if verbose:
         print ('Training Spatial LDA')
-    try:
-        lda_model = gensim.models.ldamulticore.LdaMulticore(corpus=corpus,
-                                                   id2word=id2word,
-                                                   num_topics=num_motifs, 
-                                                   random_state=random_state,**kwargs)
-    except:
-        lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
-                                                   id2word=id2word,
-                                                   num_topics=num_motifs, 
-                                                   random_state=random_state,**kwargs)
-    
-    # Compute Coherence Score
-    if verbose:
-        print ('Calculating the Coherence Score')
-    coherence_model_lda = CoherenceModel(model=lda_model, texts=texts, dictionary=id2word, coherence='c_v')
-    coherence_lda = coherence_model_lda.get_coherence()
-    if verbose:
-        print('\nCoherence Score: ', coherence_lda)
+    lda_model = LatentDirichletAllocation(
+        n_components=num_motifs,
+        random_state=random_state,
+        **kwargs,
+    )
+    topic_weights = lda_model.fit_transform(document_term_matrix)
 
     # isolate the latent features
     if verbose:
         print ('Gathering the latent weights')
-    topic_weights = []
-    for row_list in lda_model[corpus]:
-        tmp = np.zeros(num_motifs)
-        for i, w in row_list:
-            tmp[i] = w
-        topic_weights.append(tmp)
     # conver to dataframe
-    arr = pd.DataFrame(topic_weights, index=adata.obs.index).fillna(0)
-    arr = arr.add_prefix('Motif_')
+    motif_columns = ['Motif_' + str(index) for index in range(num_motifs)]
+    arr = pd.DataFrame(topic_weights, index=adata.obs.index, columns=motif_columns)
     
     # isolate the weights of phenotypes
-    pattern = "(\d\.\d+).\"(.*?)\""
-    cell_weight = pd.DataFrame(index=np.unique(adata.obs[phenotype]))
-    for i in range(0, len(lda_model.print_topics())):
-        level1 = lda_model.print_topics()[i][1]
-        tmp = pd.DataFrame(re.findall(pattern, level1))
-        tmp.index = tmp[1]
-        tmp = tmp.drop(columns=1)
-        tmp.columns = ['Motif_'+ str(i)]
-        cell_weight = cell_weight.merge(tmp, how='outer', left_index=True, right_index=True)
-    # fill zeros
-    cell_weight = cell_weight.fillna(0).astype(float)
+    topic_probabilities = lda_model.components_ / lda_model.components_.sum(
+        axis=1, keepdims=True
+    )
+    cell_weight = pd.DataFrame(
+        topic_probabilities.T, index=cell_types, columns=motif_columns
+    )
     
     # save the results in anndata object
     adata.uns[label] = arr # save the weight for each cell

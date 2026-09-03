@@ -84,7 +84,7 @@ Example:
     """
     
     # prepare data
-    data = adata.obs[[imageid,phenotype]]
+    data = adata.obs[[imageid,phenotype]].copy()
     
     # convert from and to groups to list
     if isinstance(from_group, str):
@@ -99,21 +99,21 @@ Example:
         data = data[data[phenotype].isin(subset_phenotype)]
     
     # subset data    
-    from_data = data[data[imageid].isin(from_group)]
+    from_data = data[data[imageid].isin(from_group)].copy()
     if len(from_group) > 1:
         combined_name = '_'.join(from_group)
         #from_data[imageid] = combined_name
-        from_data.loc[:, imageid] = combined_name
+        from_data[imageid] = combined_name
 
 
-    from_data.loc[:, imageid] = from_data[imageid].astype('str').astype('category')
-    from_data.loc[:, phenotype] = from_data[phenotype].astype('str').astype('category')
+    from_data[imageid] = from_data[imageid].astype('str').astype('category')
+    from_data[phenotype] = from_data[phenotype].astype('str').astype('category')
     if to_group is None:
-        to_data = data[~data[imageid].isin(from_group)]
+        to_data = data[~data[imageid].isin(from_group)].copy()
     else:
-        to_data = data[data[imageid].isin(to_group)]
-    to_data.loc[:, imageid] = to_data[imageid].astype('str').astype('category')
-    to_data.loc[:, phenotype] = to_data[phenotype].astype('str').astype('category')
+        to_data = data[data[imageid].isin(to_group)].copy()
+    to_data[imageid] = to_data[imageid].astype('str').astype('category')
+    to_data[phenotype] = to_data[phenotype].astype('str').astype('category')
     
 
     if verbose:
@@ -210,5 +210,3 @@ if __name__ == '__main__':
                    normalize=args.normalize,
                    subset_phenotype=args.subsetphenotype,
                    label=args.label)
-    
-   

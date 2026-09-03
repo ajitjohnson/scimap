@@ -56,7 +56,7 @@ def voronoi_finite_polygons_2d(vor, radius=None):
 
     center = vor.points.mean(axis=0)
     if radius is None:
-        radius = vor.points.ptp().max()
+        radius = np.ptp(vor.points).max()
 
     # Construct a map containing all ridges for a given point
     all_ridges = {}
@@ -286,7 +286,7 @@ def voronoi(
     data['index_info'] = np.arange(data.shape[0])
 
     # generate the x and y coordinates
-    points = data[[x_coordinate, y_coordinate]].values
+    points = data[[x_coordinate, y_coordinate]].to_numpy(copy=True)
 
     # invert the Y-axis
     if flip_y is True:

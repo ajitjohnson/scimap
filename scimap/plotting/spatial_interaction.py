@@ -173,7 +173,7 @@ def spatial_interaction(
         p_val_df['mean'] = p_val_df.mean(axis=1).values
         p_val_df = p_val_df[['mean']]  # keep only the mean column
         # set the P-value threshold
-        p_val_df.loc[p_val_df[p_val_df['mean'] > p_val].index, 'mean'] = np.NaN
+        p_val_df.loc[p_val_df[p_val_df['mean'] > p_val].index, 'mean'] = np.nan
         p_val_df = p_val_df['mean'].unstack()
 
         # change to the order passed in subset
@@ -300,16 +300,22 @@ def spatial_interaction(
         plt.show()
 
     if return_data is True:
-        # perpare data for export
-        map_data = interaction_map.copy()
-        p_val_data = mask.copy()
-        map_data.reset_index(inplace=True)
-        p_val_data.reset_index(inplace=True)
-        # remove the first two colums
-        map_data = map_data.drop(['phenotype', 'neighbour_phenotype'], axis=1)
-        p_val_data = p_val_data.drop(['phenotype', 'neighbour_phenotype'], axis=1)
-        p_val_data.columns = map_data.columns
-        # remove the mased values
-        final_Data = map_data.where(~p_val_data, other=np.nan)
-        final_Data.index = interaction_map.index
-        return final_Data
+        final_data = interaction_map.where(~mask, other=np.nan)
+        return final_data
+
+# =============================================================================
+#     if return_data is True:
+#         # perpare data for export
+#         map_data = interaction_map.copy()
+#         p_val_data = mask.copy()
+#         map_data.reset_index(inplace=True)
+#         p_val_data.reset_index(inplace=True)
+#         # remove the first two colums
+#         map_data = map_data.drop(['phenotype', 'neighbour_phenotype'], axis=1)
+#         p_val_data = p_val_data.drop(['phenotype', 'neighbour_phenotype'], axis=1)
+#         p_val_data.columns = map_data.columns
+#         # remove the mased values
+#         final_Data = map_data.where(~p_val_data, other=np.nan)
+#         final_Data.index = interaction_map.index
+#         return final_Data
+# =============================================================================
