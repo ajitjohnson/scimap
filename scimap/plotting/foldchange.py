@@ -123,7 +123,7 @@ def foldchange(
 
     # set color for heatmap
     # cmap_updated = copy.copy(matplotlib.cm.get_cmap(cmap))
-    cmap_updated = matplotlib.cm.get_cmap(cmap)
+    cmap_updated = matplotlib.colormaps[cmap]
     cmap_updated.set_bad(color=nonsig_color)
 
     # get the data
