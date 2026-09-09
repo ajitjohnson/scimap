@@ -36,8 +36,8 @@ anndata = "^0.13.3.post0"
 pandas = "^3.0.5"
 scipy = "^1.18.1"
 seaborn = "^0.13.2"
-tifffile = "^2026.8.23"
-numpy = "^2.5.2"
+tifffile = "^2026.9.9"
+numpy = "^2.5.3"
 pytest-xvfb = "^3.1.1"
 matplotlib = "^3.11.1"
 PhenoGraph = "^1.5.7"
@@ -46,7 +46,7 @@ mkdocs = "^1.6.1"
 plotly = "^7.0.0"
 dask = {extras = ["array"], version = "^2026.8.0"}
 zarr = "^3.3.0"
-napari = {version = "^0.9.0", optional = true}
+napari = {version = "^0.9.1", optional = true}
 numba = "^0.67.0"
 shapely = "^2.1.2"
 mkdocs-material = "^9.7.7"
@@ -64,7 +64,7 @@ napari = ["pyqt6", "napari-ome-zarr", "napari"]
 
 # Formatters
 black = "^26.5.1"
-isort = "^6.1.0"
+isort = "^9.0.1"
 
 # Linters
 mypy = "^2.3.1"
